@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		424D83DB303F682400311342 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 424D83DA303F682400311342 /* Kingfisher */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		42C2BC19303DF2A200EE40AF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				424D83DB303F682400311342 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = MatchMate;
 			packageProductDependencies = (
+				424D83DA303F682400311342 /* Kingfisher */,
 			);
 			productName = MatchMate;
 			productReference = 42C2BC09303DF2A000EE40AF /* MatchMate.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 42C2BC00303DF2A000EE40AF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				424D83D9303F682400311342 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 42C2BC0A303DF2A000EE40AF /* Products */;
 			projectDirPath = "";
@@ -578,6 +587,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		424D83D9303F682400311342 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		424D83DA303F682400311342 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 424D83D9303F682400311342 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 42C2BC01303DF2A000EE40AF /* Project object */;
 }

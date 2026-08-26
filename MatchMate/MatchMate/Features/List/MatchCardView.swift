@@ -1,71 +1,70 @@
+//
+//  MatchCardView.swift
+//  MatchMate
+//
+//  Created by Omkar Chougule on 27/08/26.
+//
+
 import SwiftUI
 
-struct MatchCardView: View {
-    let user: MatchUser
-    var onAccept: () -> Void = {}
-    var onDecline: () -> Void = {}
+public struct MatchCardView: View {
+    public let profile: Profile
+    public var onAccept: () -> Void
+    public var onDecline: () -> Void
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            photo
-            details
-            actions
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
-        )
+    public init(
+        profile: Profile,
+        onAccept: @escaping () -> Void,
+        onDecline: @escaping () -> Void
+    ) {
+        self.profile = profile
+        self.onAccept = onAccept
+        self.onDecline = onDecline
     }
 
-    private var photo: some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(Color(.tertiarySystemFill))
-            .frame(height: 260)
-            .overlay(
-                Image(systemName: "person.fill")
-                    .font(.system(size: 72, weight: .light))
-                    .foregroundStyle(.tertiary)
-            )
-    }
+    public var body: some View {
+        VStack(spacing: 16) {
+            // Large Image with White Border
+            ProfileImageView(url: profile.largePhotoURL)
+                .frame(maxWidth: 380)
+                .frame(height: 380)
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .strokeBorder(Color.white, lineWidth: 3.5)
+                )
+                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
-    private var details: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("\(user.name), \(user.age)")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.primary)
+            // Details and Action Buttons Below Image
+            VStack(alignment: .leading, spacing: 14) {
+                // Name & Age + Subtitle
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(profile.fullName), \(profile.age)")
+                        .font(.system(.title2, design: .default).weight(.bold))
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
 
-            HStack(spacing: 4) {
-                Image(systemName: "mappin.and.ellipse")
-                Text("\(user.city), \(user.country)")
+                    if !profile.locationShort.isEmpty {
+                        Text("\(profile.gender.isEmpty ? "" : "\(profile.gender.capitalized) • ")\(profile.locationShort)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+
+                // Action Buttons Component
+                MatchDecisionButtonsView(
+                    status: profile.status,
+                    onAccept: onAccept,
+                    onDecline: onDecline
+                )
             }
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
+            .padding(.horizontal, 6)
+            .padding(.bottom, 6)
         }
+        .padding(14)
+        .background(Color(uiColor: .systemBackground))
+        .matchCardContainer(cornerRadius: 24, shadowRadius: 10, shadowY: 4)
+        .id(profile.id)
     }
-
-    private var actions: some View {
-        HStack(spacing: 12) {
-            Button(action: onDecline) {
-                Label("Decline", systemImage: "xmark")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .tint(.red)
-
-            Button(action: onAccept) {
-                Label("Accept", systemImage: "heart.fill")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.pink)
-        }
-        .controlSize(.large)
-    }
-}
-
-#Preview {
-    MatchCardView(user: MatchUser.sampleData[0])
-        .padding()
-        .background(Color(.systemGroupedBackground))
 }
