@@ -15,43 +15,43 @@ public struct OfflineEmptyStateView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: ARTSpacing5) {
             ZStack {
                 Circle()
                     .fill(Color.orange.opacity(0.12))
                     .frame(width: 100, height: 100)
 
-                Image(systemName: "wifi.slash")
+                Image(systemName: AppConstants.Icons.offline)
                     .font(.system(size: 44, weight: .semibold))
                     .foregroundColor(.orange)
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, ARTSpacing2)
 
-            Text("No Matches Available")
+            Text(AppConstants.Strings.EmptyState.offlineTitle)
                 .font(.title2.weight(.bold))
                 .foregroundColor(.primary)
 
-            Text("You appear to be offline and no cached matches were found. Please check your internet connection and try again.")
+            Text(AppConstants.Strings.EmptyState.offlineSubtitle)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                .padding(.horizontal, ARTSpacing8)
 
             Button(action: onRetry) {
-                HStack(spacing: 8) {
-                    Image(systemName: "arrow.clockwise")
-                    Text("Retry Connection")
+                HStack(spacing: ARTSpacing2) {
+                    Image(systemName: AppConstants.Icons.retry)
+                    Text(AppConstants.Strings.Actions.retry)
                 }
                 .font(.headline)
                 .foregroundColor(.white)
-                .padding(.horizontal, 28)
-                .padding(.vertical, 14)
+                .padding(.horizontal, ARTSpacing7)
+                .padding(.vertical, ARTSpacing3)
                 .background(Color.accentColor)
                 .clipShape(Capsule())
                 .shadow(color: Color.accentColor.opacity(0.3), radius: 8, y: 4)
             }
             .buttonStyle(SpringBounceButtonStyle())
-            .padding(.top, 12)
+            .padding(.top, ARTSpacing3)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()

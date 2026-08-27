@@ -65,6 +65,14 @@ public final class ProfileRepositoryImpl: ProfileRepository, @unchecked Sendable
         }
     }
 
+    public func cachedProfiles(status: MatchStatus) async throws -> [Profile] {
+        do {
+            return try await local.fetchProfiles(status: status)
+        } catch {
+            throw ProfileRepositoryError.persistenceError(error.localizedDescription)
+        }
+    }
+
     public func profile(id: String) async throws -> Profile {
         do {
             if let profile = try await local.fetchProfile(id: id) {
@@ -98,5 +106,3 @@ public final class ProfileRepositoryImpl: ProfileRepository, @unchecked Sendable
         throw ProfileRepositoryError.offlineNoCachedData
     }
 }
-
-public typealias MatchRepository = ProfileRepositoryImpl

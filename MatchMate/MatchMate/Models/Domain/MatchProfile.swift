@@ -51,6 +51,10 @@ public struct MatchProfile: Identifiable, Equatable, Hashable, Sendable {
         return parts.joined(separator: ", ")
     }
 
+    public var displayPhotoURL: URL? {
+        largePhotoURL ?? mediumPhotoURL ?? thumbnailPhotoURL
+    }
+
     public var locationShort: String {
         var parts: [String] = []
         if !city.isEmpty { parts.append(city) }

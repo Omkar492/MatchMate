@@ -13,7 +13,11 @@ public protocol RandomUserRemoteDataSourceProtocol: Sendable {
 
 extension RandomUserRemoteDataSourceProtocol {
     public func fetchProfiles(page: Int) async throws -> [Profile] {
-        try await fetchProfiles(page: page, resultsPerPage: 10, seed: "matchmate")
+        try await fetchProfiles(
+            page: page,
+            resultsPerPage: AppConstants.API.defaultPageSize,
+            seed: AppConstants.API.defaultSeed
+        )
     }
 }
 
@@ -22,7 +26,7 @@ public final class RandomUserRemoteDataSource: RandomUserRemoteDataSourceProtoco
     private let session: URLSession
 
     public init(
-        baseURL: String = "https://randomuser.me/api/",
+        baseURL: String = AppConstants.API.baseURL,
         session: URLSession = .shared
     ) {
         self.baseURL = baseURL
@@ -31,17 +35,17 @@ public final class RandomUserRemoteDataSource: RandomUserRemoteDataSourceProtoco
 
     public func fetchProfiles(
         page: Int,
-        resultsPerPage: Int = 10,
-        seed: String = "matchmate"
+        resultsPerPage: Int = AppConstants.API.defaultPageSize,
+        seed: String = AppConstants.API.defaultSeed
     ) async throws -> [Profile] {
         guard var components = URLComponents(string: baseURL) else {
             throw APIError.invalidURL
         }
 
         components.queryItems = [
-            URLQueryItem(name: "page", value: String(page)),
-            URLQueryItem(name: "results", value: String(resultsPerPage)),
-            URLQueryItem(name: "seed", value: seed)
+            URLQueryItem(name: AppConstants.API.pageParam, value: String(page)),
+            URLQueryItem(name: AppConstants.API.resultsParam, value: String(resultsPerPage)),
+            URLQueryItem(name: AppConstants.API.seedParam, value: seed)
         ]
 
         guard let url = components.url else {

@@ -12,33 +12,17 @@ import SwiftData
 enum AppComposition {
     @MainActor
     static func makeMatchListViewModel(context: ModelContext) -> MatchListViewModel {
-        // These concrete types will be implemented in the Data layer (Phase 2)
         let remote = RandomUserRemoteDataSource(session: .shared)
         let local = SwiftDataLocalDataSource(context: context)
-        let repo = ProfileRepositoryImpl(remote: remote, local: local)
-
-        let fetchUseCase = DefaultFetchProfilesUseCase(repository: repo)
-        let updateUseCase = DefaultUpdateMatchStatusUseCase(repository: repo)
-
-        return MatchListViewModel(
-            fetchProfiles: fetchUseCase,
-            updateStatus: updateUseCase,
-            repository: repo
-        )
+        let repository = ProfileRepositoryImpl(remote: remote, local: local)
+        return MatchListViewModel(repository: repository)
     }
 
     @MainActor
     static func makeMatchDetailViewModel(profileId: String, context: ModelContext) -> MatchDetailViewModel {
         let remote = RandomUserRemoteDataSource(session: .shared)
         let local = SwiftDataLocalDataSource(context: context)
-        let repo = ProfileRepositoryImpl(remote: remote, local: local)
-
-        let updateUseCase = DefaultUpdateMatchStatusUseCase(repository: repo)
-
-        return MatchDetailViewModel(
-            profileId: profileId,
-            repository: repo,
-            updateStatus: updateUseCase
-        )
+        let repository = ProfileRepositoryImpl(remote: remote, local: local)
+        return MatchDetailViewModel(profileId: profileId, repository: repository)
     }
 }

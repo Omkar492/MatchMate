@@ -24,36 +24,33 @@ public struct ProfileImageView: View {
                     }
                     .resizable()
                     .scaledToFill()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .clipped()
             } else {
                 placeholderView
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var placeholderView: some View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color(red: 0.88, green: 0.88, blue: 0.92),
-                    Color(red: 0.78, green: 0.78, blue: 0.84)
+                    Color(red: 0.98, green: 0.92, blue: 0.94),
+                    Color(red: 0.95, green: 0.85, blue: 0.89)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
-            VStack(spacing: 8) {
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 64, weight: .light))
-                    .foregroundColor(Color.white.opacity(0.65))
+            VStack(spacing: 6) {
+                Image(systemName: AppConstants.Icons.placeholderAvatar)
+                    .font(.system(size: 40, weight: .light))
+                    .foregroundColor(AppConstants.Colors.primaryPink.opacity(0.4))
 
                 ProgressView()
-                    .tint(.white)
-                    .scaleEffect(0.9)
+                    .tint(AppConstants.Colors.primaryPink)
+                    .scaleEffect(0.8)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

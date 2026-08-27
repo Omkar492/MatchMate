@@ -10,6 +10,8 @@ import Observation
 
 @Observable
 public final class MatchDetailViewModel {
+    // MARK: - State Properties
+
     public var profile: Profile?
     public var error: ProfileRepositoryError?
     public var isUpdating: Bool = false
@@ -25,21 +27,22 @@ public final class MatchDetailViewModel {
         return ""
     }
 
+    // MARK: - Dependencies
+
     public let profileId: String
     private let repository: ProfileRepository
-    private let updateStatus: UpdateMatchStatusUseCase
     private let bioGenerator: BioGeneratorServiceProtocol
     private var updatesTask: Task<Void, Never>?
+
+    // MARK: - Initialization
 
     public init(
         profileId: String,
         repository: ProfileRepository,
-        updateStatus: UpdateMatchStatusUseCase,
         bioGenerator: BioGeneratorServiceProtocol = FoundationBioGenerator.shared
     ) {
         self.profileId = profileId
         self.repository = repository
-        self.updateStatus = updateStatus
         self.bioGenerator = bioGenerator
         listenToProfileUpdates()
     }
@@ -47,22 +50,17 @@ public final class MatchDetailViewModel {
     public convenience init(
         profile: Profile,
         repository: ProfileRepository,
-        updateStatus: UpdateMatchStatusUseCase? = nil,
         bioGenerator: BioGeneratorServiceProtocol = FoundationBioGenerator.shared
     ) {
-        let useCase = updateStatus ?? DefaultUpdateMatchStatusUseCase(repository: repository)
-        self.init(
-            profileId: profile.id,
-            repository: repository,
-            updateStatus: useCase,
-            bioGenerator: bioGenerator
-        )
+        self.init(profileId: profile.id, repository: repository, bioGenerator: bioGenerator)
         self.profile = profile
     }
 
     deinit {
         updatesTask?.cancel()
     }
+
+    // MARK: - Live Stream Listening
 
     private func listenToProfileUpdates() {
         updatesTask = Task { [weak self] in
@@ -76,6 +74,8 @@ public final class MatchDetailViewModel {
             }
         }
     }
+
+    // MARK: - Actions
 
     @MainActor
     public func loadProfile() async {
@@ -92,21 +92,20 @@ public final class MatchDetailViewModel {
 
     @MainActor
     public func accept() async {
-        await update(status: .accepted)
+        await updateStatus(to: .accepted)
     }
 
     @MainActor
     public func decline() async {
-        await update(status: .declined)
+        await updateStatus(to: .declined)
     }
 
     @MainActor
-    public func update(status newStatus: MatchStatus) async {
+    private func updateStatus(to newStatus: MatchStatus) async {
         guard var currentProfile = profile else {
-            // If profile not loaded yet, fetch first
             await loadProfile()
             if profile == nil { return }
-            await update(status: newStatus)
+            await updateStatus(to: newStatus)
             return
         }
 
@@ -120,8 +119,7 @@ public final class MatchDetailViewModel {
 
         // 2. Persist to SwiftData
         do {
-            let updated = try await updateStatus.execute(id: profileId, status: newStatus)
-            self.profile = updated
+            self.profile = try await repository.updateStatus(id: profileId, status: newStatus)
         } catch {
             // 3. Rollback on failure
             currentProfile.status = oldStatus

@@ -26,7 +26,7 @@ public struct MatchDetailView: View {
 
                 if let profile = viewModel.profile {
                     ScrollView {
-                        VStack(spacing: 20) {
+                        VStack(spacing: ARTSpacing4) {
                             // Hero Profile Card
                             heroProfileCard(for: profile)
 
@@ -36,15 +36,16 @@ public struct MatchDetailView: View {
                             // Personal Info Section Card
                             personalInfoSectionCard(for: profile)
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 10)
-                        .padding(.bottom, 36)
+                        .padding(.horizontal, ARTSpacing5)
+                        .padding(.top, ARTSpacing2)
+                        .padding(.bottom, ARTSpacing9)
                     }
                 } else {
-                    VStack(spacing: 16) {
+                    VStack(spacing: ARTSpacing4) {
                         ProgressView()
                             .scaleEffect(1.2)
-                        Text("Loading profile...")
+                            .tint(AppConstants.Colors.primaryPink)
+                        Text(AppConstants.Strings.EmptyState.loadingProfile)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -75,56 +76,61 @@ public struct MatchDetailView: View {
             Button {
                 dismiss()
             } label: {
-                Image(systemName: "chevron.left")
-                    .circularActionHeaderStyle(size: 40)
+                Image(systemName: AppConstants.Icons.back)
+                    .circularActionHeaderStyle(size: ARTSpacing10)
             }
 
             Spacer()
 
-            Text("Profile Details")
+            Text(AppConstants.Strings.Navigation.profileDetailsTitle)
                 .font(.headline.weight(.bold))
                 .foregroundColor(.primary)
 
             Spacer()
 
-            // Balance spacer
             Color.clear
-                .frame(width: 40, height: 40)
+                .frame(width: ARTSpacing10, height: ARTSpacing10)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 8)
+        .padding(.horizontal, ARTSpacing5)
+        .padding(.top, ARTSpacing3)
+        .padding(.bottom, ARTSpacing2)
         .background(Color(uiColor: .systemGroupedBackground))
     }
 
     // MARK: - Hero Profile Card
 
     private func heroProfileCard(for profile: Profile) -> some View {
-        VStack(spacing: 16) {
-            // Large Image with White Border
+        VStack(spacing: ARTSpacing4) {
+            // Large Hero Image with White Border
             ProfileImageView(url: profile.largePhotoURL)
                 .frame(maxWidth: .infinity)
                 .frame(height: 380)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.imageCornerRadius, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .strokeBorder(Color.white, lineWidth: 3.5)
+                    RoundedRectangle(cornerRadius: AppConstants.UI.imageCornerRadius, style: .continuous)
+                        .strokeBorder(Color.white, lineWidth: AppConstants.UI.imageBorderWidth)
                 )
                 .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 
             // Content & Action Buttons Below Image
-            VStack(alignment: .leading, spacing: 14) {
-                VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: ARTSpacing3) {
+                VStack(alignment: .leading, spacing: ARTSpacing1) {
                     Text("\(profile.fullName), \(profile.age)")
                         .font(.system(.title2, design: .default).weight(.bold))
                         .foregroundColor(.primary)
                         .lineLimit(2)
 
                     if !profile.locationShort.isEmpty {
-                        Text("\(profile.gender.isEmpty ? "" : "\(profile.gender.capitalized) • ")\(profile.locationShort)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
+                        HStack(spacing: ARTSpacing1) {
+                            Image(systemName: AppConstants.Icons.location)
+                                .font(.caption)
+                                .foregroundColor(AppConstants.Colors.primaryPink)
+
+                            Text("\(profile.gender.isEmpty ? "" : "\(profile.gender.capitalized) • ")\(profile.locationShort)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
                     }
                 }
 
@@ -139,84 +145,88 @@ public struct MatchDetailView: View {
                     }
                 )
             }
-            .padding(.horizontal, 6)
-            .padding(.bottom, 6)
+            .padding(.horizontal, ARTSpacing1)
+            .padding(.bottom, ARTSpacing1)
         }
-        .padding(14)
+        .padding(ARTSpacing4)
         .background(Color(uiColor: .systemBackground))
-        .matchCardContainer(cornerRadius: 24, shadowRadius: 10, shadowY: 4)
+        .matchCardContainer(
+            cornerRadius: AppConstants.UI.cardCornerRadius,
+            shadowRadius: AppConstants.UI.shadowRadius,
+            shadowY: AppConstants.UI.shadowY
+        )
         .id(profile.id)
     }
 
     // MARK: - About Section Card
 
     private func aboutSectionCard(for profile: Profile) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 6) {
-                Text("About")
+        VStack(alignment: .leading, spacing: ARTSpacing2) {
+            HStack(spacing: ARTSpacing1) {
+                Text(AppConstants.Strings.Detail.aboutSectionTitle)
                     .font(.headline.weight(.bold))
                     .foregroundColor(.primary)
 
-                Image(systemName: "sparkles")
+                Image(systemName: AppConstants.Icons.sparkles)
                     .font(.caption)
-                    .foregroundColor(.pink)
+                    .foregroundColor(AppConstants.Colors.primaryPink)
             }
 
             Text(viewModel.bioText)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-                .lineSpacing(4)
+                .lineSpacing(ARTSpacing1)
         }
-        .detailSectionCard(cornerRadius: 20, padding: 20)
+        .detailSectionCard(cornerRadius: AppConstants.UI.sectionCornerRadius, padding: ARTSpacing4)
     }
 
     // MARK: - Personal Info Section Card
 
     private func personalInfoSectionCard(for profile: Profile) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Personal Info")
+        VStack(alignment: .leading, spacing: ARTSpacing4) {
+            Text(AppConstants.Strings.Detail.personalInfoSectionTitle)
                 .font(.headline.weight(.bold))
                 .foregroundColor(.primary)
 
-            VStack(spacing: 14) {
-                infoRow(icon: "person.fill", title: "Name", value: profile.fullName)
+            VStack(spacing: ARTSpacing3) {
+                infoRow(icon: AppConstants.Icons.person, title: AppConstants.Strings.Detail.nameLabel, value: profile.fullName)
 
                 if !profile.gender.isEmpty {
-                    infoRow(icon: "figure.stand", title: "Gender", value: profile.gender.capitalized)
+                    infoRow(icon: AppConstants.Icons.gender, title: AppConstants.Strings.Detail.genderLabel, value: profile.gender.capitalized)
                 }
 
                 if !profile.email.isEmpty {
-                    infoRow(icon: "envelope.fill", title: "Email", value: profile.email)
+                    infoRow(icon: AppConstants.Icons.email, title: AppConstants.Strings.Detail.emailLabel, value: profile.email)
                 }
 
                 if !profile.phone.isEmpty {
-                    infoRow(icon: "phone.fill", title: "Phone", value: profile.phone)
+                    infoRow(icon: AppConstants.Icons.phone, title: AppConstants.Strings.Detail.phoneLabel, value: profile.phone)
                 }
 
                 if !profile.cell.isEmpty {
-                    infoRow(icon: "iphone", title: "Mobile", value: profile.cell)
+                    infoRow(icon: AppConstants.Icons.mobile, title: AppConstants.Strings.Detail.mobileLabel, value: profile.cell)
                 }
 
                 if !profile.locationShort.isEmpty {
-                    infoRow(icon: "mappin.circle.fill", title: "Location", value: profile.fullAddress.isEmpty ? profile.locationShort : profile.fullAddress)
+                    infoRow(icon: AppConstants.Icons.location, title: AppConstants.Strings.Detail.locationLabel, value: profile.fullAddress.isEmpty ? profile.locationShort : profile.fullAddress)
                 }
 
                 if !profile.nationality.isEmpty {
-                    infoRow(icon: "flag.fill", title: "Nationality", value: profile.nationality)
+                    infoRow(icon: AppConstants.Icons.nationality, title: AppConstants.Strings.Detail.nationalityLabel, value: profile.nationality)
                 }
 
-                infoRow(icon: "calendar", title: "Registered", value: profile.registeredDate.formatted(date: .abbreviated, time: .omitted))
+                infoRow(icon: AppConstants.Icons.calendar, title: AppConstants.Strings.Detail.registeredLabel, value: profile.registeredDate.formatted(date: .abbreviated, time: .omitted))
             }
         }
-        .detailSectionCard(cornerRadius: 20, padding: 20)
+        .detailSectionCard(cornerRadius: AppConstants.UI.sectionCornerRadius, padding: ARTSpacing4)
     }
 
     private func infoRow(icon: String, title: String, value: String) -> some View {
-        HStack(spacing: 14) {
+        HStack(spacing: ARTSpacing3) {
             Image(systemName: icon)
                 .font(.subheadline)
-                .foregroundColor(.primary)
-                .frame(width: 24, height: 24)
+                .foregroundColor(AppConstants.Colors.primaryPink)
+                .frame(width: ARTSpacing6, height: ARTSpacing6)
 
             Text(title)
                 .font(.subheadline)

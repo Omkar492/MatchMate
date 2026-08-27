@@ -16,8 +16,22 @@ public enum MatchFilter: String, CaseIterable, Sendable {
 
 @Observable
 public final class MatchListViewModel {
-    public var profiles: [Profile] = []
-    public var selectedFilter: MatchFilter = .all
+    // MARK: - State Properties
+
+    public var allProfiles: [Profile] = []
+    public var acceptedProfiles: [Profile] = []
+    public var declinedProfiles: [Profile] = []
+
+    public var selectedFilter: MatchFilter = .all {
+        didSet {
+            if selectedFilter != .all {
+                Task { @MainActor in
+                    await loadDecidedProfilesFromSwiftData()
+                }
+            }
+        }
+    }
+
     public var isLoadingInitial: Bool = false
     public var isLoadingNextPage: Bool = false
     public var isRefreshing: Bool = false
@@ -25,66 +39,70 @@ public final class MatchListViewModel {
     public var isOffline: Bool = false
     public var hasMorePages: Bool = true
 
-    public var filteredProfiles: [Profile] {
+    /// Active profiles to display in the UI based on selected filter
+    public var displayedProfiles: [Profile] {
         switch selectedFilter {
         case .all:
-            return profiles
+            return allProfiles
         case .accepted:
-            return profiles.filter { $0.status == .accepted }
+            return acceptedProfiles
         case .declined:
-            return profiles.filter { $0.status == .declined }
+            return declinedProfiles
         }
     }
 
-    public var isLoadingPage: Bool {
-        isLoadingInitial || isLoadingNextPage
+    public var filteredProfiles: [Profile] {
+        displayedProfiles
     }
 
-    private let fetchProfiles: FetchProfilesUseCase
-    private let updateStatus: UpdateMatchStatusUseCase
+    public var profiles: [Profile] {
+        get { allProfiles }
+        set { allProfiles = newValue }
+    }
+
+    // MARK: - Dependencies
+
     private let repository: ProfileRepository
     private var currentPage: Int = 1
     private var updatesTask: Task<Void, Never>?
 
-    public init(
-        fetchProfiles: FetchProfilesUseCase,
-        updateStatus: UpdateMatchStatusUseCase,
-        repository: ProfileRepository
-    ) {
-        self.fetchProfiles = fetchProfiles
-        self.updateStatus = updateStatus
+    // MARK: - Initialization
+
+    public init(repository: ProfileRepository) {
         self.repository = repository
         listenToProfileUpdates()
-    }
-
-    public convenience init(repository: ProfileRepository) {
-        self.init(
-            fetchProfiles: DefaultFetchProfilesUseCase(repository: repository),
-            updateStatus: DefaultUpdateMatchStatusUseCase(repository: repository),
-            repository: repository
-        )
     }
 
     deinit {
         updatesTask?.cancel()
     }
 
+    // MARK: - Live Stream Listening
+
     private func listenToProfileUpdates() {
         updatesTask = Task { [weak self] in
             guard let self else { return }
             for await updatedProfile in self.repository.profileUpdates {
                 await MainActor.run {
-                    if let index = self.profiles.firstIndex(where: { $0.id == updatedProfile.id }) {
-                        self.profiles[index] = updatedProfile
+                    if let index = self.allProfiles.firstIndex(where: { $0.id == updatedProfile.id }) {
+                        self.allProfiles[index] = updatedProfile
                     }
+                    Task { await self.loadDecidedProfilesFromSwiftData() }
                 }
             }
         }
     }
 
+    // MARK: - Actions
+
     @MainActor
     public func loadInitial(forceRefresh: Bool = false) async {
-        if !forceRefresh && !profiles.isEmpty {
+        if selectedFilter != .all {
+            await loadDecidedProfilesFromSwiftData()
+            return
+        }
+
+        if !forceRefresh && !allProfiles.isEmpty {
             await refreshFromCache()
             return
         }
@@ -99,9 +117,9 @@ public final class MatchListViewModel {
         hasMorePages = true
 
         do {
-            let fetched = try await fetchProfiles.execute(page: 1)
-            self.profiles = fetched
+            self.allProfiles = try await repository.fetchProfiles(page: 1)
             self.isOffline = false
+            await loadDecidedProfilesFromSwiftData()
         } catch let repoError as ProfileRepositoryError {
             self.error = repoError
             if case .offlineNoCachedData = repoError {
@@ -120,23 +138,22 @@ public final class MatchListViewModel {
 
     @MainActor
     public func loadNextPageIfNeeded(currentItem: Profile) async {
+        guard selectedFilter == .all else { return }
         guard !isLoadingInitial, !isLoadingNextPage, hasMorePages else { return }
 
-        // Find index of current item in profiles
-        guard let index = profiles.firstIndex(where: { $0.id == currentItem.id }) else { return }
-
-        // Trigger pagination smoothly when within the last 4 items
-        let thresholdIndex = max(0, profiles.count - 4)
+        guard let index = allProfiles.firstIndex(where: { $0.id == currentItem.id }) else { return }
+        let thresholdIndex = max(0, allProfiles.count - 4)
         guard index >= thresholdIndex else { return }
 
         isLoadingNextPage = true
         let nextPage = currentPage + 1
 
         do {
-            let fetched = try await fetchProfiles.execute(page: nextPage)
-            if fetched.count > self.profiles.count {
-                self.profiles = fetched
+            let fetched = try await repository.fetchProfiles(page: nextPage)
+            if fetched.count > self.allProfiles.count {
+                self.allProfiles = fetched
                 self.currentPage = nextPage
+                await loadDecidedProfilesFromSwiftData()
             } else {
                 self.hasMorePages = false
             }
@@ -153,46 +170,46 @@ public final class MatchListViewModel {
     }
 
     @MainActor
-    public func loadNextPageIfNeeded(currentProfile: Profile) async {
-        await loadNextPageIfNeeded(currentItem: currentProfile)
-    }
-
-    @MainActor
-    public func accept(_ id: String) async {
+    public func accept(id: String) async {
         await optimisticallyUpdateStatus(id: id, newStatus: .accepted)
     }
 
     @MainActor
-    public func accept(id: String) async {
-        await accept(id)
-    }
-
-    @MainActor
-    public func decline(_ id: String) async {
+    public func decline(id: String) async {
         await optimisticallyUpdateStatus(id: id, newStatus: .declined)
     }
 
     @MainActor
-    public func decline(id: String) async {
-        await decline(id)
-    }
-
-    @MainActor
     private func optimisticallyUpdateStatus(id: String, newStatus: MatchStatus) async {
-        guard let index = profiles.firstIndex(where: { $0.id == id }) else { return }
-        let oldStatus = profiles[index].status
+        guard let index = allProfiles.firstIndex(where: { $0.id == id }) else { return }
+        let oldStatus = allProfiles[index].status
         guard oldStatus != newStatus else { return }
 
-        // 1. Optimistic UI update
-        profiles[index].status = newStatus
+        // 1. Optimistic in-memory update
+        allProfiles[index].status = newStatus
 
         // 2. Persist to SwiftData
         do {
-            _ = try await updateStatus.execute(id: id, status: newStatus)
+            _ = try await repository.updateStatus(id: id, status: newStatus)
+            await loadDecidedProfilesFromSwiftData()
         } catch {
             // 3. Rollback on failure
-            profiles[index].status = oldStatus
+            allProfiles[index].status = oldStatus
             self.error = .persistenceError(error.localizedDescription)
+        }
+    }
+
+    @MainActor
+    public func loadDecidedProfilesFromSwiftData() async {
+        do {
+            async let acceptedTask = repository.cachedProfiles(status: .accepted)
+            async let declinedTask = repository.cachedProfiles(status: .declined)
+
+            let (accepted, declined) = try await (acceptedTask, declinedTask)
+            self.acceptedProfiles = accepted
+            self.declinedProfiles = declined
+        } catch {
+            // SwiftData error
         }
     }
 
@@ -201,11 +218,12 @@ public final class MatchListViewModel {
         do {
             let cached = try await repository.cachedProfiles()
             if !cached.isEmpty {
-                self.profiles = cached
+                self.allProfiles = cached
                 self.isOffline = false
             }
+            await loadDecidedProfilesFromSwiftData()
         } catch {
-            // Cache fetch error
+            // Cache query error
         }
     }
 

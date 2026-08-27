@@ -11,9 +11,17 @@ import SwiftData
 public protocol SwiftDataLocalDataSourceProtocol: Sendable {
     func saveProfiles(_ profiles: [Profile], forPage page: Int) async throws -> [Profile]
     func fetchProfiles() async throws -> [Profile]
+    func fetchProfiles(status: MatchStatus) async throws -> [Profile]
     func fetchProfile(id: String) async throws -> Profile?
     func updateStatus(id: String, status: MatchStatus) async throws -> Profile
     func clearAll() async throws
+}
+
+extension SwiftDataLocalDataSourceProtocol {
+    public func fetchProfiles(status: MatchStatus) async throws -> [Profile] {
+        let all = try await fetchProfiles()
+        return all.filter { $0.status == status }
+    }
 }
 
 @MainActor
@@ -64,6 +72,23 @@ public final class SwiftDataLocalDataSource: SwiftDataLocalDataSourceProtocol {
             sortBy: [
                 SortDescriptor(\.orderIndex, order: .forward),
                 SortDescriptor(\.pageIndex, order: .forward)
+            ]
+        )
+        descriptor.includePendingChanges = true
+
+        let entities = try context.fetch(descriptor)
+        return entities.map { $0.toDomain() }
+    }
+
+    public func fetchProfiles(status: MatchStatus) async throws -> [Profile] {
+        let raw = status.rawValue
+        var descriptor = FetchDescriptor<ProfileEntity>(
+            predicate: #Predicate<ProfileEntity> { entity in
+                entity.statusRaw == raw
+            },
+            sortBy: [
+                SortDescriptor(\.orderIndex, order: .forward),
+                SortDescriptor(\.updatedAt, order: .reverse)
             ]
         )
         descriptor.includePendingChanges = true

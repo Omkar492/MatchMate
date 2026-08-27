@@ -30,8 +30,8 @@ final class MatchListViewModelTests: XCTestCase {
 
         await sut.loadInitial(forceRefresh: true)
 
-        XCTAssertEqual(sut.profiles.count, 2)
-        XCTAssertEqual(sut.profiles.first?.id, MatchProfile.mock1.id)
+        XCTAssertEqual(sut.allProfiles.count, 2)
+        XCTAssertEqual(sut.allProfiles.first?.id, MatchProfile.mock1.id)
         XCTAssertNil(sut.error)
         XCTAssertFalse(sut.isOffline)
         XCTAssertFalse(sut.isLoadingInitial)
@@ -43,7 +43,7 @@ final class MatchListViewModelTests: XCTestCase {
 
         await sut.loadInitial(forceRefresh: true)
 
-        XCTAssertTrue(sut.profiles.isEmpty)
+        XCTAssertTrue(sut.allProfiles.isEmpty)
         XCTAssertTrue(sut.isOffline)
         XCTAssertEqual(sut.error, ProfileRepositoryError.offlineNoCachedData)
     }
@@ -58,15 +58,15 @@ final class MatchListViewModelTests: XCTestCase {
         ]
         mockRepo.fetchResult = .success(MatchProfile.mockList + page2Profiles)
 
-        guard let lastProfile = sut.profiles.last else {
+        guard let lastProfile = sut.allProfiles.last else {
             XCTFail("Profiles should not be empty")
             return
         }
 
-        await sut.loadNextPageIfNeeded(currentProfile: lastProfile)
+        await sut.loadNextPageIfNeeded(currentItem: lastProfile)
 
-        XCTAssertEqual(sut.profiles.count, 4)
-        XCTAssertEqual(sut.profiles.last?.id, "p4")
+        XCTAssertEqual(sut.allProfiles.count, 4)
+        XCTAssertEqual(sut.allProfiles.last?.id, "p4")
     }
 
     func test_loadNextPageIfNeeded_whenNotAtBottom_doesNotTrigger() async {
@@ -74,14 +74,16 @@ final class MatchListViewModelTests: XCTestCase {
         let p2 = MatchProfile(id: "p2", firstName: "C", lastName: "D", age: 21, status: .pending, pageIndex: 1)
         let p3 = MatchProfile(id: "p3", firstName: "E", lastName: "F", age: 22, status: .pending, pageIndex: 1)
         let p4 = MatchProfile(id: "p4", firstName: "G", lastName: "H", age: 23, status: .pending, pageIndex: 1)
+        let p5 = MatchProfile(id: "p5", firstName: "I", lastName: "J", age: 24, status: .pending, pageIndex: 1)
+        let p6 = MatchProfile(id: "p6", firstName: "K", lastName: "L", age: 25, status: .pending, pageIndex: 1)
 
-        mockRepo.fetchResult = .success([p1, p2, p3, p4])
+        mockRepo.fetchResult = .success([p1, p2, p3, p4, p5, p6])
         await sut.loadInitial(forceRefresh: true)
 
         let initialCallCount = mockRepo.fetchCallCount
 
-        // Trigger on the first item (not near bottom)
-        await sut.loadNextPageIfNeeded(currentProfile: p1)
+        // Trigger on the first item (far from the bottom threshold of 4 items)
+        await sut.loadNextPageIfNeeded(currentItem: p1)
 
         XCTAssertEqual(mockRepo.fetchCallCount, initialCallCount)
     }
@@ -91,11 +93,11 @@ final class MatchListViewModelTests: XCTestCase {
         await sut.loadInitial(forceRefresh: true)
 
         let targetId = MatchProfile.mock1.id
-        XCTAssertEqual(sut.profiles.first(where: { $0.id == targetId })?.status, .pending)
+        XCTAssertEqual(sut.allProfiles.first(where: { $0.id == targetId })?.status, .pending)
 
         await sut.accept(id: targetId)
 
-        XCTAssertEqual(sut.profiles.first(where: { $0.id == targetId })?.status, .accepted)
+        XCTAssertEqual(sut.allProfiles.first(where: { $0.id == targetId })?.status, .accepted)
         XCTAssertEqual(mockRepo.updateStatusCallCount, 1)
         XCTAssertNil(sut.error)
     }
@@ -105,11 +107,11 @@ final class MatchListViewModelTests: XCTestCase {
         await sut.loadInitial(forceRefresh: true)
 
         let targetId = MatchProfile.mock1.id
-        XCTAssertEqual(sut.profiles.first(where: { $0.id == targetId })?.status, .pending)
+        XCTAssertEqual(sut.allProfiles.first(where: { $0.id == targetId })?.status, .pending)
 
         await sut.decline(id: targetId)
 
-        XCTAssertEqual(sut.profiles.first(where: { $0.id == targetId })?.status, .declined)
+        XCTAssertEqual(sut.allProfiles.first(where: { $0.id == targetId })?.status, .declined)
         XCTAssertEqual(mockRepo.updateStatusCallCount, 1)
         XCTAssertNil(sut.error)
     }
@@ -124,7 +126,7 @@ final class MatchListViewModelTests: XCTestCase {
         await sut.accept(id: targetId)
 
         // Status should be rolled back to pending
-        XCTAssertEqual(sut.profiles.first(where: { $0.id == targetId })?.status, .pending)
+        XCTAssertEqual(sut.allProfiles.first(where: { $0.id == targetId })?.status, .pending)
         XCTAssertNotNil(sut.error)
     }
 
@@ -140,6 +142,6 @@ final class MatchListViewModelTests: XCTestCase {
         // Give the async stream a moment to dispatch
         try? await Task.sleep(nanoseconds: 50_000_000)
 
-        XCTAssertEqual(sut.profiles.first(where: { $0.id == MatchProfile.mock1.id })?.status, .accepted)
+        XCTAssertEqual(sut.allProfiles.first(where: { $0.id == MatchProfile.mock1.id })?.status, .accepted)
     }
 }

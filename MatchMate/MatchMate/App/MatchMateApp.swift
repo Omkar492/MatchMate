@@ -16,7 +16,7 @@ struct MatchMateApp: App {
     }()
 
     init() {
-        // Pre-warm the Foundation bio generator model asynchronously at app launch
+        // Pre-warm the FoundationModels bio generator model asynchronously at app launch
         Task.detached(priority: .utility) {
             await FoundationBioGenerator.shared.prewarm()
         }

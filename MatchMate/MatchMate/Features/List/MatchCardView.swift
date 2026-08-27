@@ -23,48 +23,66 @@ public struct MatchCardView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
-            // Large Image with White Border
-            ProfileImageView(url: profile.largePhotoURL)
-                .frame(maxWidth: 380)
-                .frame(height: 380)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .strokeBorder(Color.white, lineWidth: 3.5)
-                )
-                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        VStack(spacing: ARTSpacing4) {
+            // Top Section: 128x128 Crisp Image with Curved Edges & Shadow Effect
+            HStack(spacing: ARTSpacing4) {
+                ProfileImageView(url: profile.displayPhotoURL)
+                    .frame(width: AppConstants.UI.imageDimension, height: AppConstants.UI.imageDimension)
+                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.imageCornerRadius, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppConstants.UI.imageCornerRadius, style: .continuous)
+                            .strokeBorder(Color.white, lineWidth: AppConstants.UI.imageBorderWidth)
+                    )
+                    .shadow(color: AppConstants.Colors.primaryPink.opacity(0.18), radius: 8, x: 0, y: 4)
 
-            // Details and Action Buttons Below Image
-            VStack(alignment: .leading, spacing: 14) {
-                // Name & Age + Subtitle
-                VStack(alignment: .leading, spacing: 4) {
+                // Profile Info alongside image
+                VStack(alignment: .leading, spacing: ARTSpacing1) {
                     Text("\(profile.fullName), \(profile.age)")
-                        .font(.system(.title2, design: .default).weight(.bold))
+                        .font(.system(.title3, design: .default).weight(.bold))
                         .foregroundColor(.primary)
-                        .lineLimit(1)
+                        .lineLimit(2)
 
                     if !profile.locationShort.isEmpty {
-                        Text("\(profile.gender.isEmpty ? "" : "\(profile.gender.capitalized) • ")\(profile.locationShort)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
+                        HStack(spacing: ARTSpacing1) {
+                            Image(systemName: AppConstants.Icons.location)
+                                .font(.caption2)
+                                .foregroundColor(AppConstants.Colors.primaryPink)
+
+                            Text(profile.locationShort)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+
+                    if !profile.gender.isEmpty {
+                        Text(profile.gender.capitalized)
+                            .font(.caption.weight(.medium))
+                            .foregroundColor(AppConstants.Colors.primaryPink)
+                            .padding(.horizontal, ARTSpacing2)
+                            .padding(.vertical, ARTSpacing1)
+                            .background(AppConstants.Colors.softPink)
+                            .clipShape(Capsule())
                     }
                 }
-
-                // Action Buttons Component
-                MatchDecisionButtonsView(
-                    status: profile.status,
-                    onAccept: onAccept,
-                    onDecline: onDecline
-                )
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, 6)
-            .padding(.bottom, 6)
+            .padding(.top, ARTSpacing1)
+
+            // Bottom Section: Themed Action Buttons (Pink Accept + White Decline)
+            MatchDecisionButtonsView(
+                status: profile.status,
+                onAccept: onAccept,
+                onDecline: onDecline
+            )
         }
-        .padding(14)
+        .padding(ARTSpacing4)
         .background(Color(uiColor: .systemBackground))
-        .matchCardContainer(cornerRadius: 24, shadowRadius: 10, shadowY: 4)
+        .matchCardContainer(
+            cornerRadius: AppConstants.UI.cardCornerRadius,
+            shadowRadius: AppConstants.UI.shadowRadius,
+            shadowY: AppConstants.UI.shadowY
+        )
         .id(profile.id)
     }
 }

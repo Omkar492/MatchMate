@@ -23,32 +23,44 @@ public struct MatchDecisionButtonsView: View {
     }
 
     public var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: ARTSpacing3) {
             switch status {
             case .pending:
+                // Decline Button: White fill, Pink text + Xmark icon
                 Button(action: onDecline) {
-                    Text("Decline")
-                        .declineActionButtonStyle()
+                    HStack(spacing: ARTSpacing1) {
+                        Image(systemName: AppConstants.Icons.xmark)
+                            .font(.system(size: 14, weight: .bold))
+                        Text(AppConstants.Strings.Actions.decline)
+                    }
+                    .declineActionButtonStyle()
                 }
                 .buttonStyle(SpringBounceButtonStyle(scaleAmount: 0.94))
 
+                // Accept Button: Pink fill, White text + Heart icon
                 Button(action: onAccept) {
-                    Text("Accept")
-                        .acceptActionButtonStyle()
+                    HStack(spacing: ARTSpacing1) {
+                        Image(systemName: AppConstants.Icons.heartFill)
+                            .font(.system(size: 14, weight: .bold))
+                        Text(AppConstants.Strings.Actions.accept)
+                    }
+                    .acceptActionButtonStyle()
                 }
                 .buttonStyle(SpringBounceButtonStyle(scaleAmount: 0.94))
 
             case .accepted:
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                    Text("Accepted")
+                HStack(spacing: ARTSpacing1) {
+                    Image(systemName: AppConstants.Icons.heartFill)
+                        .font(.system(size: 14, weight: .bold))
+                    Text(AppConstants.Strings.Actions.accepted)
                 }
                 .statusBannerStyle(for: .accepted)
 
             case .declined:
-                HStack(spacing: 8) {
-                    Image(systemName: "xmark.circle.fill")
-                    Text("Declined")
+                HStack(spacing: ARTSpacing1) {
+                    Image(systemName: AppConstants.Icons.xmark)
+                        .font(.system(size: 14, weight: .bold))
+                    Text(AppConstants.Strings.Actions.declined)
                 }
                 .statusBannerStyle(for: .declined)
             }
