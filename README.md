@@ -6,13 +6,12 @@ It fetches match profiles with infinite pagination from the Random User API, cac
 
 ---
 
+
 ## 📱 App Screenshots
 
 | Matches List Feed | Filtered Decisions | Profile Details |
 | :---: | :---: | :---: |
-| ![Matches List](https://placehold.co/300x650/FFFFFF/F43F5E?text=Matches+List+Feed) | ![Filtered Decisions](https://placehold.co/300x650/FFFFFF/F43F5E?text=Accepted+%26+Declined) | ![Profile Details](https://placehold.co/300x650/FFFFFF/F43F5E?text=Profile+Details+%26+AI+Bio) |
-
-> *(Place your actual simulator screenshots here by replacing the placeholder links above with paths to your assets/screenshots in the repository.)*
+| <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 11 55 47" src="https://github.com/user-attachments/assets/b45e6130-4cda-4a82-984a-b2f2d96f89c1" /> | <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 11 56 22" src="https://github.com/user-attachments/assets/994a138b-2908-4d61-a1e9-0cc862dd517b" /> | <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 11 57 47" src="https://github.com/user-attachments/assets/13628d43-8910-4ce8-8279-2368ecacb315" /> |
 
 ---
 
@@ -85,15 +84,13 @@ flowchart TD
 
 ## 💾 Database Choice: Why SwiftData Over Core Data?
 
-We selected Apple's **SwiftData** framework for local offline persistence over legacy Core Data:
-
-| Feature / Metric | SwiftData (Chosen) | Legacy Core Data |
-| :--- | :--- | :--- |
-| **Declaration & Schema** | Pure Swift `@Model` class macros without external `.xcdatamodeld` mapping files. | Requires separate XML-based `.xcdatamodeld` files and `NSManagedObject` subclasses. |
-| **Observation System** | Native Swift Observation (`@Observable`) with automatic fine-grained UI view invalidation. | Requires `@FetchRequest`, `NSFetchedResultsController`, or manual Combine notifications. |
-| **Concurrency Model** | Built for Swift 6 structured concurrency and `Sendable` `async/await` patterns. | Heavy boilerplate with `performAndWait`, thread-confinement rules, and context locks. |
-| **Type Safety** | Strongly-typed compile-time property modeling and native `#Predicate` macros. | Runtime stringly-typed `NSPredicate` queries prone to runtime typos and crashes. |
-| **Testing Isolation** | In-memory containers (`ModelConfiguration(isStoredInMemoryOnly: true)`) start in milliseconds for unit tests. | Complex setup with in-memory persistent store coordinators and custom coordinator stacks. |
+For local offline persistence, we opted for Apple's SwiftData over legacy Core Data to fully embrace modern Swift paradigms. Moving to SwiftData provided several immediate architectural benefits:
+### 1. Code-First Schema: 
+- We utilize pure Swift @Model macros, removing the overhead of managing XML-based .xcdatamodeld files and legacy NSManagedObject subclasses.
+### 2: Native Observation: 
+- Seamless integration with Swift's @Observable system gives us automatic, fine-grained UI updates without relying on @FetchRequest or Combine boilerplate.
+### 3. Modern Concurrency & Safety: 
+- SwiftData is built for Swift 6 structured concurrency (async/await), ditching legacy thread-confinement locks. It also replaces stringly-typed, crash-prone NSPredicates with strongly-typed, compile-time #Predicate macros.
 
 ---
 
@@ -138,21 +135,7 @@ Integrated in [`FoundationBioGenerator.swift`](file:///Users/omkarchougule/Deskt
 
 ## 📐 Design System & 4-Point Grid Spacing
 
-The application enforces a **4-point grid system** with standardized constants defined in [`AppConstants.swift`](file:///Users/omkarchougule/Desktop/Interview%20Prep/MatchMate/MatchMate/MatchMate/Features/Shared/Constants/AppConstants.swift):
-
-| Constant | Value | Description |
-| :--- | :--- | :--- |
-| **`ARTSpacing1`** | **4 pt** | Micro-spacing, icon-to-text gap |
-| **`ARTSpacing2`** | **8 pt** | Small margins, pill padding, header gaps |
-| **`ARTSpacing3`** | **12 pt** | Button row spacing, info row gaps |
-| **`ARTSpacing4`** | **16 pt** | Standard padding, card insets, stack vertical gaps |
-| **`ARTSpacing5`** | **20 pt** | Standard screen horizontal edge margins |
-| **`ARTSpacing6`** | **24 pt** | Large layout margins, bottom scroll paddings |
-| **`ARTSpacing7`** | **28 pt** | Prominent action button horizontal insets |
-| **`ARTSpacing8`** | **32 pt** | Empty state horizontal container padding |
-| **`ARTSpacing9`** | **36 pt** | Detail view bottom scroll inset |
-| **`ARTSpacing10`** | **40 pt** | Circular action buttons & header element dimensions |
-
+- The application enforces a **4-point grid system** with standardized constants defined in [`AppConstants.swift`](file:///Users/omkarchougule/Desktop/Interview%20Prep/MatchMate/MatchMate/MatchMate/Features/Shared/Constants/AppConstants.swift):
 - **Color Palette**: Vibrant Dating Pink (`#F43F5E`) paired with crisp pure White cards and soft gray backgrounds.
 - **Image Optimization**: 128×128 curved photos with white borders and elevation shadows on the list cards; large hero presentation on detail view.
 
@@ -164,13 +147,15 @@ The application enforces a **4-point grid system** with standardized constants d
 2. **Undo Action**: Display a temporary floating snackbar with an "Undo" button after accepting or declining a match.
 3. **Advanced Filtering & Sorting**: Filter by age range, distance radius, or nationality.
 4. **Image Gallery**: Support multi-photo carousel browsing if extended in API response.
+5. Introducing **MLX LLM Integration** to find the closest match in terms of location, age and sex and display on the card.
 
 ---
 
 ## ⏱️ Rough Hours Spent & AI Development Attribution
 
-### AI Tool Used:
-- **Google Antigravity** (DeepMind Advanced Agentic Coding Assistant) — Used throughout the project lifecycle for architectural pair programming, domain modeling, SwiftUI design iterations, Foundation Models integration, and test harness authoring.
+### AI Assisted Development:
+- **Google Antigravity**
+- **Claude Code**
 
 ### Development Breakdown:
 
@@ -185,6 +170,3 @@ The application enforces a **4-point grid system** with standardized constants d
 | **Total Rough Hours Spent** | **~10.0 hours** | |
 
 ---
-
-## 📄 License
-This project is open-source and available under the MIT License.
