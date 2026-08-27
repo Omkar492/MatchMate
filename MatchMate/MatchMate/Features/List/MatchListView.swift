@@ -170,7 +170,7 @@ public struct MatchListView: View {
                 } label: {
                     Text(filter.rawValue)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(isSelected ? .white : .primary.opacity(0.8))
+                        .foregroundColor(isSelected ? .white : .black)
                         .padding(.horizontal, ARTSpacing4)
                         .padding(.vertical, ARTSpacing2)
                         .background(
