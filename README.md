@@ -159,6 +159,7 @@ Integrated in [`FoundationBioGenerator.swift`](file:///Users/omkarchougule/Deskt
 
 ---
 
-## ⏱️ Rough Hours Spent - 6-7 hours with the help of AI Assisted development
+## ⏱️ Rough Hours Spent - AI Assisted Development
 
+It took around 9 - 10 hours of development using the free tier of Claude Code + Google Gemini for AI Assisted development.
 ---
