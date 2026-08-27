@@ -159,18 +159,6 @@ Integrated in [`FoundationBioGenerator.swift`](file:///Users/omkarchougule/Deskt
 
 ---
 
-## ⏱️ Rough Hours Spent
-
-### Development Breakdown:
-
-| Task / Phase | Time Spent | Key Focus Areas |
-| :--- | :---: | :--- |
-| **Ideation, Architecture & Domain Modeling** | **~1.5 hours** | Defining Clean MVVM-Repository boundaries, protocols, SwiftData models, and `login.uuid` uniqueness. |
-| **SwiftData Storage & Remote API Integration** | **~2.0 hours** | Network layer, DTO decoding with synthesized `Decodable`, SwiftData upserting, and decision preservation. |
-| **SwiftUI Visual Design & Theming** | **~2.5 hours** | White & Pink theme, 128x128 curved image layout, hero card, custom button modifiers, and 4-pt grid system. |
-| **Pagination & Real-Time Sync (`AsyncStream`)** | **~1.5 hours** | Reactive bidirectional synchronization, infinite prefetching, and multi-collection ViewModel routing. |
-| **On-Device Foundation Models (Apple Intelligence)** | **~1.0 hour** | Native `FoundationModels` framework integration, on-device offline bio generation, and startup pre-warming. |
-| **Code Cleanup, Refactoring & Unit Testing** | **~1.5 hours** | Removing transitive pass-throughs, centralized `AppConstants`, and comprehensive unit test verification. |
-| **Total Rough Hours Spent** | **~10.0 hours** | |
+## ⏱️ Rough Hours Spent - 6-7 hours with the help of AI Assisted development
 
 ---
