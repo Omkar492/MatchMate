@@ -159,11 +159,7 @@ Integrated in [`FoundationBioGenerator.swift`](file:///Users/omkarchougule/Deskt
 
 ---
 
-## ⏱️ Rough Hours Spent & AI Development Attribution
-
-### AI Assisted Development:
-- **Google Antigravity**
-- **Claude Code**
+## ⏱️ Rough Hours Spent
 
 ### Development Breakdown:
 
