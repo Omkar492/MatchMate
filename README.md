@@ -13,6 +13,14 @@ It fetches match profiles with infinite pagination from the Random User API, cac
 | :---: | :---: | :---: |
 | <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 11 55 47" src="https://github.com/user-attachments/assets/b45e6130-4cda-4a82-984a-b2f2d96f89c1" /> | <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 11 56 22" src="https://github.com/user-attachments/assets/994a138b-2908-4d61-a1e9-0cc862dd517b" /> | <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 11 57 47" src="https://github.com/user-attachments/assets/13628d43-8910-4ce8-8279-2368ecacb315" /> |
 
+| Matches List Feed - Dark Mode | Filtered Decisions - Dark Mode | Profile Details - Dark Mode |
+| :---: | :---: | :---: |
+| <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 12 20 54" src="https://github.com/user-attachments/assets/af02112f-f799-4262-a105-d91172f59334" /> | <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 12 21 25" src="https://github.com/user-attachments/assets/519a757b-ab0c-4f89-9be8-f90aafa1c163" /> | <img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 Pro - 2026-08-27 at 12 22 23" src="https://github.com/user-attachments/assets/8afb4981-7a41-4620-979d-aa5ecef255d5" /> |
+
+
+
+
+
 ---
 
 ## 🛠️ How to Run the App
